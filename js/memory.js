@@ -1,4 +1,6 @@
 export var game = function(){
+    var punts
+    var temps
     const back = '../resources/back.png';
     const resources = ['../resources/cb.png', '../resources/co.png', '../resources/sb.png','../resources/so.png', '../resources/tb.png','../resources/to.png'];
     const card = {
@@ -9,7 +11,7 @@ export var game = function(){
                 this.current = back;
                 this.clickable = true;
                 this.callback();
-            }, 1000);
+            }, temps);
         },
         goFront: function (){
             this.current = this.front;
@@ -18,9 +20,34 @@ export var game = function(){
         }
     };
 
+    const default_options = {
+        pairs:2,
+        difficulty:'normal'
+    };
+    var options = JSON.parse(localStorage.options||JSON.stringify(default_options));
+
     var lastCard;
-    var pairs = 2;
+    var pairs = options.pairs;
     var points = 100;
+    var difficulty = options.difficulty;
+
+    switch(difficulty){
+
+        case 'easy':
+            temps=2000;
+            punts=15;
+            break;
+
+        case 'normal':
+            temps=1000;
+            punts=25;
+            break;
+
+        case 'hard':
+            temps=500;
+            punts=50;
+            break;
+    }
 
     return {
         init: function (call){
@@ -29,7 +56,17 @@ export var game = function(){
             items = items.slice(0, pairs); // Agafem els primers
             items = items.concat(items);
             items.sort(() => Math.random() - 0.5); // Aleatòria
-            return items.map(item => Object.create(card, {front: {value:item}, callback: {value:call}}));
+            var i = items.map(item => Object.create(card, {front: {value:item}, callback: {value:call}}));
+            i.forEach(obj => {
+                obj.current = obj.front;
+                obj.clickable=false;
+                setTimeout(() => {
+                    obj.current = back;
+                    obj.clickable = true;
+                    obj.callback();
+                }, temps);
+            });
+            return i;
         },
         click: function (card){
             if (!card.clickable) return;
@@ -44,7 +81,7 @@ export var game = function(){
                 }
                 else{
                     [card, lastCard].forEach(c=>c.goBack());
-                    points-=25;
+                    points-=punts;
                     if (points <= 0){
                         alert ("Has perdut");
                         window.location.replace("../");
