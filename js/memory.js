@@ -1,4 +1,6 @@
 export var game = function(){
+    var punts
+    var temps
     const back = '../resources/back.png';
     const resources = ['../resources/cb.png', '../resources/co.png', '../resources/sb.png','../resources/so.png', '../resources/tb.png','../resources/to.png'];
     const card = {
@@ -29,12 +31,45 @@ export var game = function(){
         }
     };
 
+  
+ 
+    const default_options = {
+        pairs:2,
+        difficulty:'normal'
+    };
+    var options = JSON.parse(localStorage.options||JSON.stringify(default_options));
+
     var lastCard;
-    var pairs = 2;
+    var pairs = options.pairs;
     var points = 100;
+    var difficulty = options.difficulty;
     var cards = []; // Llistat de cartes
 
+    
+    console.log(difficulty)
+
+
+    switch(difficulty){
+
+        case 'easy':
+            temps=2000;
+            punts=15;
+            break;
+
+        case 'normal':
+            temps=1000;
+            punts=25;
+            break;
+
+        case 'hard':
+            temps=500;
+            punts=50;
+            break;
+    }
+   
+
     var mix = function(){
+        console.log(pairs)
         var items = resources.slice(); // Copiem l'array
         items.sort(() => Math.random() - 0.5); // Aleatòria
         items = items.slice(0, pairs); // Agafem els primers
