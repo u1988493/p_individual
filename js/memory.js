@@ -13,16 +13,16 @@ export var game = function(){
                 this.current = back;
                 this.clickable = true;
                 this.callback();
-            }, 1000);
+            }, temps);
         },
         goFront: function (last){
             if (last)
                 this.waiting = last.waiting = false;
             else
                 this.waiting = true;
-            this.current = this.front;
-            this.clickable = false;
-            this.callback();
+                this.current = this.front;
+                this.clickable = false;
+                this.callback();
         },
         check: function (other){
             if (this.front === other.front)
@@ -82,7 +82,7 @@ export var game = function(){
                 let partida = JSON.parse(sessionStorage.save);
                 pairs = partida.pairs;
                 points = partida.points;
-                partida.cards.map(item=>{
+                var i = partida.cards.map(item=>{
                     let it = Object.create(card);
                     it.front = item.front;
                     it.current = item.current;
@@ -93,10 +93,24 @@ export var game = function(){
                     if (it.current != back && !it.waiting && !it.isDone) it.goBack();
                     else if (it.waiting) lastCard = it;
                 });
+
                 return cards;
             }
             else return mix().map(item => { // New game
+
                 cards.push(Object.create(card, { front: {value:item}, callback: {value:call}}));
+                
+                cards.forEach(c=>{
+                    c.current = c.front
+                    c.clickable = false
+                    setTimeout(() => {
+                        c.current = back;
+                        c.clickable = true;
+                        c.callback();
+                    }, temps);
+
+                });
+                
                 return cards[cards.length-1];
             });
         },
@@ -113,7 +127,7 @@ export var game = function(){
                 }
                 else{
                     [card, lastCard].forEach(c=>c.goBack());
-                    points-=25;
+                    points-=punts;
                     if (points <= 0){
                         alert ("Has perdut");
                         window.location.replace("../");

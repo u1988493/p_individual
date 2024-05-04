@@ -1,17 +1,27 @@
-#title, .center{
+h1, .center{
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 #game{
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-    width: 200px;
+	display: flex;
+   
 }
 
-#title{
+h1{
 	color:red;
 	text-align: center;
+}
+
+#save{
+	padding: 10px 20px;
+	font-size: 16px;
+}
+
+
+
+canvas {
+    
+	  margin: auto;
 }
