@@ -1,170 +1,187 @@
-export var game = function(){
-    var punts
-    var temps
+export var game = function() {
     const back = '../resources/back.png';
-    const resources = ['../resources/cb.png', '../resources/co.png', '../resources/sb.png','../resources/so.png', '../resources/tb.png','../resources/to.png'];
+    const resources = [
+        '../resources/cb.png', '../resources/co.png', '../resources/sb.png',
+        '../resources/so.png', '../resources/tb.png', '../resources/to.png'
+    ];
     const card = {
         current: back,
         clickable: true,
         waiting: false,
         isDone: false,
-        goBack: function (){
+        goBack: function() {
             setTimeout(() => {
                 this.current = back;
                 this.clickable = true;
                 this.callback();
-            }, temps);
+            }, this.temps);
         },
-        goFront: function (last){
-            if (last)
+        goFront: function(last) {
+            if (last) {
                 this.waiting = last.waiting = false;
-            else
+            } else {
                 this.waiting = true;
-                this.current = this.front;
-                this.clickable = false;
-                this.callback();
+            }
+            this.current = this.front;
+            this.clickable = false;
+            this.callback();
         },
-        check: function (other){
-            if (this.front === other.front)
+        check: function(other) {
+            if (this.front === other.front) {
                 this.isDone = other.isDone = true;
+            }
             return this.isDone;
         }
     };
 
-  
- 
-    const default_options = {
-        pairs:2,
-        difficulty:'normal'
+    const default_options2 = {
+        level: 1, // Nivel inicial
+        difficulty: 'normal' // Dificultad
     };
-    var options = JSON.parse(localStorage.options||JSON.stringify(default_options));
 
+    var options = JSON.parse(localStorage.options2 || JSON.stringify(default_options2));
+    console.log(options)
     var lastCard;
-    var level = options.pairs;
+    var level = parseInt(localStorage.getItem('level')) || options.level;
     var pairs;
     var points = 100;
     var difficulty = options.difficulty;
-    var penalty;
-    var cards = []; // Llistat de cartes
+    var cards = [];
+    
+    var temps, punts;
 
-    function updateDifficulty(level) {
-        pairs = Math.min(level + 1, 6);
-        temps =  Math.max(2000 - (level - 1) * 400, 3000)
-        penalty = level > 5 ? 10 + (level - 5) * 5 : 0;
-        localStorage.setItem('nivell', level);
-       localStorage.setItem('parelles', pairs);
-       localStorage.setItem('temps', temps);
-       localStorage.setItem('penalitzacio', penalty);
-   }
-
-    updateDifficulty(level);
-
-
-  
-
-    var mix = function(){
-        console.log(pairs)
-        var items = resources.slice(); // Copiem l'array
-        items.sort(() => Math.random() - 0.5); // Aleatòria
-        items = items.slice(0, pairs); // Agafem els primers
-        items = items.concat(items);
-        return items.sort(() => Math.random() - 0.5); // Aleatòria
+    updateLevel()
+    function updateLevel(){
+       if(level == 1){
+        pairs = 2
+       }else if(level == 2){
+        pairs = 3 
+       }else if(level == 3){
+        pairs = 4
+       }else if(level == 4){
+        pairs = 5
+       }else if(level >= 5){
+        pairs = 6
+       }
     }
+
+   
+    switch (difficulty) {
+        case 'easy':
+            temps = 2000 - (level - 1) * 200;
+            punts = 15;
+            break;
+        case 'normal':
+            temps = 1000 - (level - 1) * 100;
+            punts = 25;
+            break;
+        case 'hard':
+            temps = 500 - (level - 1) * 50;
+            punts = 50;
+            break;
+        default:
+            temps = 1000;
+            punts = 25;
+    }
+    temps = Math.max(500, temps); // Asegurarse de que el tiempo no es demasiado corto
+   
+    var mix = function() {
+        var items = resources.slice();
+        items.sort(() => Math.random() - 0.5);
+        items = items.slice(0, pairs);
+        items = items.concat(items);
+        return items.sort(() => Math.random() - 0.5);
+    }
+
     return {
-        init: function (call){
-            if (sessionStorage.save){ // Load game
+        init: function(call) {
+            if (sessionStorage.save) {
                 let partida = JSON.parse(sessionStorage.save);
                 pairs = partida.pairs;
                 points = partida.points;
-                var i = partida.cards.map(item=>{
+                cards = partida.cards.map(item => {
                     let it = Object.create(card);
                     it.front = item.front;
                     it.current = item.current;
                     it.isDone = item.isDone;
                     it.waiting = item.waiting;
                     it.callback = call;
-                    cards.push(it);
-                    if (it.current != back && !it.waiting && !it.isDone) it.goBack();
-                    else if (it.waiting) lastCard = it;
+                    it.temps = temps;
+                    return it;
                 });
-
                 return cards;
-            }
-            else return mix().map(item => { // New game
-                console.log(pairs)
-                cards.push(Object.create(card, { front: {value:item}, callback: {value:call}}));
-               
-                cards.forEach(c=>{
-                    c.current = c.front
-                    c.clickable = false
+            } else {
+                console.log(level)
+                return mix().map(item => {
+                    let newCard = Object.create(card, {
+                        front: { value: item },
+                        callback: { value: call },
+                        temps: { value: temps }
+                    });
+                    cards.push(newCard);
                     setTimeout(() => {
-                        c.current = back;
-                        c.clickable = true;
-                        c.callback();
+                        newCard.current = back;
+                        newCard.clickable = true;
+                        newCard.callback();
                     }, temps);
-                    
+                    return newCard;
                 });
-                
-                return cards[cards.length-1];
-            });
+            }
         },
-        click: function (card){
+        click: function(card) {
             if (!card.clickable) return;
             card.goFront(lastCard);
-            if (lastCard){ // Segona carta
-                if (card.check(lastCard)){
+            if (lastCard) {
+                if (card.check(lastCard)) {
                     pairs--;
-                    if (pairs <= 0){
+                    if (pairs <= 0) {
                         alert("Has guanyat amb " + points + " punts!");
-                        window.location.reload();
-                        
+                        localStorage.setItem('level', level + 1); 
+                        setTimeout(() => {
+                            location.reload();
+                        }, 100);
                     }
-                }
-                else{
-                    [card, lastCard].forEach(c=>c.goBack());
-                    points-=punts;
-                    if (points <= 0){
-                        alert ("Has perdut");
+                } else {
+                    [card, lastCard].forEach(c => c.goBack());
+                    points -= punts;
+                    if (points <= 0) {
+                        alert("Has perdut");
                         window.location.replace("../");
                     }
                 }
                 lastCard = null;
+            } else {
+                lastCard = card;
             }
-            else lastCard = card; // Primera carta
         },
-        save: function (){
+        save: function() {
             var partida = {
                 uuid: localStorage.uuid,
                 pairs: pairs,
                 points: points,
-                cards: []
-            };
-            cards.forEach(c=>{
-                partida.cards.push({
+                cards: cards.map(c => ({
                     current: c.current,
                     front: c.front,
                     isDone: c.isDone,
                     waiting: c.waiting
-                });
-            });
-
+                }))
+            };
             let json_partida = JSON.stringify(partida);
-
-            fetch("../php/save.php",{
+            fetch("../php/save.php", {
                 method: "POST",
                 body: json_partida,
                 headers: {"content-type":"application/json; charset=UTF-8"}
             })
-            .then(response=>response.json())
+            .then(response => response.json())
             .then(json => {
                 console.log(json);
             })
-            .catch(err=>{
+            .catch(err => {
                 console.log(err);
                 localStorage.save = json_partida;
                 console.log(localStorage.save);
             })
-            .finally(()=>{
+            .finally(() => {
                 window.location.replace("../");
             });
         }
