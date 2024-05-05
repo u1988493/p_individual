@@ -40,7 +40,6 @@ export var game = function() {
     };
 
     var options = JSON.parse(localStorage.options2 || JSON.stringify(default_options2));
-    console.log(options)
     var lastCard;
     var level = parseInt(localStorage.getItem('level')) || options.level;
     var pairs;
@@ -50,40 +49,6 @@ export var game = function() {
     
     var temps, punts;
 
-    updateLevel()
-    function updateLevel(){
-       if(level == 1){
-        pairs = 2
-       }else if(level == 2){
-        pairs = 3 
-       }else if(level == 3){
-        pairs = 4
-       }else if(level == 4){
-        pairs = 5
-       }else if(level >= 5){
-        pairs = 6
-       }
-    }
-
-   
-    switch (difficulty) {
-        case 'easy':
-            temps = 2000 - (level - 1) * 200;
-            punts = 15;
-            break;
-        case 'normal':
-            temps = 1000 - (level - 1) * 100;
-            punts = 25;
-            break;
-        case 'hard':
-            temps = 500 - (level - 1) * 50;
-            punts = 50;
-            break;
-        default:
-            temps = 1000;
-            punts = 25;
-    }
-    temps = Math.max(500, temps); // Asegurarse de que el tiempo no es demasiado corto
    
     var mix = function() {
         var items = resources.slice();
