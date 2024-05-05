@@ -1,12 +1,4 @@
 
-
-#title, .center{
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-
-}
-
 body {
     text-align: center; 
 }
@@ -18,7 +10,7 @@ body {
     text-align: center; 
 }
 
-#title {
+h1 {
     color: red;
 }
 
@@ -28,11 +20,6 @@ label, input, select, button {
     margin-left: auto;
     margin-right: auto;
     text-align: center; 
-}
-
-#title{
-	color:red;
-	text-align: center;
 }
 
 button {

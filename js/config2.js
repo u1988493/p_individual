@@ -1,5 +1,4 @@
-import { PlayScene } from "./scene.js";
-//import { PlayScene } from "./scene2.js";
+import { PlayScene } from "./scene2.js";
 
 
 var config = {
@@ -19,5 +18,3 @@ var config = {
 }
 
 var game = new Phaser.Game(config);
-
-

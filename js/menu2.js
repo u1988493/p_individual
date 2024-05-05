@@ -2,7 +2,7 @@ addEventListener('load', function() {
     document.getElementById('play').addEventListener('click', 
     function(){
         sessionStorage.removeItem("save");
-        window.location.assign("../html/phasergame.html");
+        window.location.assign("../html/phasergame2.html");
     });
 
     document.getElementById('saves').addEventListener('click', 
@@ -18,14 +18,13 @@ addEventListener('load', function() {
         })
         .then(partida=>sessionStorage.save = partida)
         .catch(err=>sessionStorage.save = localStorage.save)
-        .finally(()=>window.location.assign("../html/phasergame.html"));
+        .finally(()=>window.location.assign("../html/phasergame2.html"));
     });
 
     document.getElementById('options').addEventListener('click', 
     function(){
-        window.location.assign("../html/options.html");
+        window.location.assign("../html/options2.html");
     });
-
     document.getElementById('exit').addEventListener('click', 
     function(){
         console.warn("No es pot sortir!");

@@ -40,33 +40,27 @@ export var game = function(){
     var options = JSON.parse(localStorage.options||JSON.stringify(default_options));
 
     var lastCard;
-    var pairs = options.pairs;
+    var level = options.pairs;
+    var pairs;
     var points = 100;
     var difficulty = options.difficulty;
+    var penalty;
     var cards = []; // Llistat de cartes
 
-    
-    console.log(difficulty)
+    function updateDifficulty(level) {
+        pairs = Math.min(level + 1, 6);
+        temps =  Math.max(2000 - (level - 1) * 400, 3000)
+        penalty = level > 5 ? 10 + (level - 5) * 5 : 0;
+        localStorage.setItem('nivell', level);
+       localStorage.setItem('parelles', pairs);
+       localStorage.setItem('temps', temps);
+       localStorage.setItem('penalitzacio', penalty);
+   }
+
+    updateDifficulty(level);
 
 
-    switch(difficulty){
-
-        case 'easy':
-            temps=2000;
-            punts=15;
-            break;
-
-        case 'normal':
-            temps=1000;
-            punts=25;
-            break;
-
-        case 'hard':
-            temps=500;
-            punts=50;
-            break;
-    }
-   
+  
 
     var mix = function(){
         console.log(pairs)
@@ -97,9 +91,9 @@ export var game = function(){
                 return cards;
             }
             else return mix().map(item => { // New game
-
+                console.log(pairs)
                 cards.push(Object.create(card, { front: {value:item}, callback: {value:call}}));
-                
+               
                 cards.forEach(c=>{
                     c.current = c.front
                     c.clickable = false
@@ -122,7 +116,8 @@ export var game = function(){
                     pairs--;
                     if (pairs <= 0){
                         alert("Has guanyat amb " + points + " punts!");
-                        window.location.replace("../");
+                        window.location.reload();
+                        
                     }
                 }
                 else{
