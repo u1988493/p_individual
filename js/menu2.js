@@ -23,7 +23,7 @@ addEventListener('load', function() {
 
     document.getElementById('options').addEventListener('click', 
     function(){
-        window.location.assign("../html/options.html");
+        window.location.assign("../html/options2.html");
     });
     document.getElementById('exit').addEventListener('click', 
     function(){

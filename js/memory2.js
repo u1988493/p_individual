@@ -41,7 +41,8 @@ export var game = function() {
 
     var options = JSON.parse(localStorage.options2 || JSON.stringify(default_options2));
     var lastCard;
-    var level = parseInt(localStorage.getItem('level')) || options.level;
+    console.log(options);
+    var level = parseInt(sessionStorage.getItem('level')) || options.level;
     var pairs;
     var points = 100;
     var difficulty = options.difficulty;
@@ -53,7 +54,7 @@ export var game = function() {
     var mix = function() {
         var items = resources.slice();
         items.sort(() => Math.random() - 0.5);
-        items = items.slice(0, pairs);
+        items = items.slice(0, level);
         items = items.concat(items);
         return items.sort(() => Math.random() - 0.5);
     }
@@ -101,7 +102,7 @@ export var game = function() {
                     pairs--;
                     if (pairs <= 0) {
                         alert("Has guanyat amb " + points + " punts!");
-                        localStorage.setItem('level', level + 1); 
+                        sessionStorage.setItem('level', level + 1); 
                         setTimeout(() => {
                             location.reload();
                         }, 100);
